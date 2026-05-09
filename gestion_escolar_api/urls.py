@@ -3,7 +3,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from .views.bootstrap import VersionView
-from gestion_escolar_api.views import users
+from gestion_escolar_api.views import auth, users
 from gestion_escolar_api.views import AlumnoView  # Importamos el ARCHIVO
 from gestion_escolar_api.views import MaestroView # Importamos el ARCHIVO
 
@@ -22,6 +22,11 @@ urlpatterns = [
     # --- ENDPOINTS DE MAESTROS ---
     # Aquí: Archivo MaestroView . Clase MaestroView
     path('maestros/', MaestroView.MaestroView.as_view()),
+
+    #Login
+        path('login/', auth.CustomAuthToken.as_view()),
+    #Logout
+        path('logout/', auth.Logout.as_view())
 ]
 
 if settings.DEBUG:
