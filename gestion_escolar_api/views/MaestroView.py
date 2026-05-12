@@ -1,9 +1,31 @@
+from django.db.models import *
 from django.db import transaction
-from rest_framework import generics, permissions, status
+from gestion_escolar_api.models import Administradores, Maestros
+from gestion_escolar_api.serializers import UserSerializer
+from gestion_escolar_api.serializers import *
+from gestion_escolar_api.models import *
+from rest_framework import permissions
+from rest_framework import generics
+from rest_framework import status
 from rest_framework.response import Response
-from django.contrib.auth.models import User, Group
-from gestion_escolar_api.serializers import UserSerializer, MaestrosSerializer
-from gestion_escolar_api.models import Maestros
+from django.contrib.auth.models import Group
+import json
+
+class MaestrosAll(generics.CreateAPIView):
+    #Obtener todos los maestros
+    # Necesita permisos de autenticación de usuario para poder acceder a la petición
+    permission_classes = (permissions.IsAuthenticated,)
+    def get(self, request, *args, **kwargs):
+        maestros = Maestros.objects.filter(user__is_active=1).order_by("id")
+        lista = MaestrosSerializer(maestros, many=True).data
+        for maestro in lista:
+            if isinstance(maestro, dict) and "materias_json" in maestro:
+                try:
+                    maestro["materias_json"] = json.loads(maestro["materias_json"])
+                except Exception:
+                    maestro["materias_json"] = []
+        return Response(lista, 200)
+
 
 class MaestroView(generics.CreateAPIView):
     # Permisos por método (sobrescribe el comportamiento default)
