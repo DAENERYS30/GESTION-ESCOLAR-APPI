@@ -5,7 +5,19 @@ from django.contrib.auth.models import User, Group
 from gestion_escolar_api.serializers import UserSerializer, AlumnosSerializer
 from gestion_escolar_api.models import Alumnos
 
+class AlumnosAll(generics.CreateAPIView):
+    # Requerimos token para seguridad
+    permission_classes = (permissions.IsAuthenticated,)
 
+    def get(self, request, *args, **kwargs):
+        # 1. Filtramos alumnos con usuarios activos
+        # OJO: Si no aparecen, prueba quitando el filter(...) y usa .all() para descartar
+        alumnos = Alumnos.objects.filter(user__is_active=1).order_by("id")
+        
+        # 2. Pasamos los datos por el serializador que me acabas de mostrar
+        lista = AlumnosSerializer(alumnos, many=True).data
+        
+        return Response(lista, 200)
 
 class AlumnoView(generics.CreateAPIView):
     # Permisos por método (sobrescribe el comportamiento default)
