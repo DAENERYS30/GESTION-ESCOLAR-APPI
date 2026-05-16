@@ -27,6 +27,14 @@ class AdminView(generics.CreateAPIView):
             return [permissions.IsAuthenticated()]
         return []  # POST no requiere autenticación
     
+     #Obtener un administrador específico por su ID
+    def get(self, request, *args, **kwargs):
+        admin = Administradores.objects.filter(id=request.GET.get("id"), user__is_active=1).first()
+        if not admin:
+            return Response({"message": "Administrador no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+        serializer = AdminSerializer(admin)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
     #Registrar nuevo usuario administrador
     @transaction.atomic
     def post(self, request, *args, **kwargs):
@@ -77,3 +85,26 @@ class AdminView(generics.CreateAPIView):
             return Response({"Administrador creado ID": admin.id }, 201)
 
         return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)
+     # Actualizar datos del administrador
+    @transaction.atomic
+    def put(self, request, *args, **kwargs):
+        admin = Administradores.objects.filter(id=request.data["id"], user__is_active=1).first()
+        if not admin:
+            return Response({"message": "Administrador no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+
+        user = admin.user
+        # Actualizar campos del usuario
+        user.first_name = request.data["first_name"]
+        user.last_name = request.data["last_name"]
+        #Guardamos los cambios del usuario no es necesario actualizar la contraseña
+        user.save()
+
+        # Actualizar campos del administrador
+        admin.clave_admin = request.data["clave_admin"]
+        admin.telefono = request.data["telefono"]
+        admin.rfc = request.data["rfc"].upper()
+        admin.edad = request.data["edad"]
+        admin.ocupacion = request.data["ocupacion"]
+        admin.save()
+
+        return Response({"message": "Administrador actualizado correctamente"}, status=status.HTTP_200_OK)

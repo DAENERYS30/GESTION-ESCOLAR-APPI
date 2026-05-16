@@ -24,8 +24,7 @@ class MaestrosSerializer(serializers.ModelSerializer):
     class Meta:
         model = Maestros
         fields = '__all__'
-
-""" Serializer para la nueva tabla de alumnos. Incluye un campo 'user' que es de solo lectura y utiliza el UserSerializer para mostrar los detalles del usuario asociado. """
+ 
 class AlumnosSerializer(serializers.ModelSerializer):
     user=UserSerializer(read_only=True)
     class Meta:

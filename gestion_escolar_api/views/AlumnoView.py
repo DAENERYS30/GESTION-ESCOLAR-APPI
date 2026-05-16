@@ -10,11 +10,10 @@ class AlumnosAll(generics.CreateAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):
-        # 1. Filtramos alumnos con usuarios activos
-        # OJO: Si no aparecen, prueba quitando el filter(...) y usa .all() para descartar
+        # Filtramos alumnos con usuarios activos
         alumnos = Alumnos.objects.filter(user__is_active=1).order_by("id")
         
-        # 2. Pasamos los datos por el serializador que me acabas de mostrar
+        # Pasamos los datos por el serializador
         lista = AlumnosSerializer(alumnos, many=True).data
         
         return Response(lista, 200)
