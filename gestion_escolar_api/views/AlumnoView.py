@@ -25,6 +25,14 @@ class AlumnoView(generics.CreateAPIView):
             return [permissions.IsAuthenticated()]
         return []  # POST no requiere autenticación
     
+    #Obtener un alumno específico por su ID
+    def get(self, request, *args, **kwargs):
+        alumno = Alumnos.objects.filter(id=request.GET.get("id"), user__is_active=1).first()
+        if not alumno:
+            return Response({"message": "Alumno no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+        serializer = AlumnosSerializer(alumno)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
     # Registrar nuevo usuario alumno
     @transaction.atomic
     def post(self, request, *args, **kwargs):
@@ -77,3 +85,27 @@ class AlumnoView(generics.CreateAPIView):
             return Response({"Alumno creado ID": alumno.id }, 201)
 
         return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+     # Actualizar datos del alumno
+    @transaction.atomic
+    def put(self, request, *args, **kwargs):
+        alumno = Alumnos.objects.filter(id=request.data["id"], user__is_active=1).first()
+        if not alumno:
+            return Response({"message": "Alumno no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+
+        user = alumno.user
+        # Actualizar campos del usuario
+        user.first_name = request.data["first_name"]
+        user.last_name = request.data["last_name"]
+        #Guardamos los cambios del usuario no es necesario actualizar la contraseña
+        user.save()
+
+        # Actualizar campos del alumno
+        alumno.matricula = request.data["matricula"]
+        alumno.curp = request.data["curp"].upper()
+        alumno.rfc = request.data["rfc"].upper()
+        alumno.edad = request.data["edad"]
+        alumno.ocupacion = request.data["ocupacion"]
+        alumno.save()
+
+        return Response({"message": "Alumno  actualizado correctamente"}, status=status.HTTP_200_OK)

@@ -85,6 +85,8 @@ class AdminView(generics.CreateAPIView):
             return Response({"Administrador creado ID": admin.id }, 201)
 
         return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    
      # Actualizar datos del administrador
     @transaction.atomic
     def put(self, request, *args, **kwargs):
