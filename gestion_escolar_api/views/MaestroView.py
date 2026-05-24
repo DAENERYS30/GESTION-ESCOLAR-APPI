@@ -10,6 +10,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from django.contrib.auth.models import Group
 import json
+from django.shortcuts import get_object_or_404
 
 class MaestrosAll(generics.CreateAPIView):
     #Obtener todos los maestros
@@ -119,4 +120,13 @@ class MaestroView(generics.CreateAPIView):
         maestro.save()
 
         return Response({"message": "Maestro actualizado correctamente"}, status=status.HTTP_200_OK)
+    
+    #Función para eliminar un maestro específico por su ID
+    def delete(self, request, *args, **kwargs):
+        maestro = get_object_or_404(Maestros, id=request.GET.get("id"))
+        try:
+            maestro.user.delete()
+            return Response({"details":"Maestro eliminado"},200)
+        except Exception as e:
+            return Response({"details":"Error al eliminar maestro"},400)
     

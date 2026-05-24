@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from django.contrib.auth.models import User, Group
 from gestion_escolar_api.serializers import UserSerializer, AlumnosSerializer
 from gestion_escolar_api.models import Alumnos
+from django.shortcuts import get_object_or_404
 
 class AlumnosAll(generics.CreateAPIView):
     # Requerimos token para seguridad
@@ -86,7 +87,7 @@ class AlumnoView(generics.CreateAPIView):
 
         return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)
     
-     # Actualizar datos del alumno
+     # Actualizar datos del alumno con put
     @transaction.atomic
     def put(self, request, *args, **kwargs):
         alumno = Alumnos.objects.filter(id=request.data["id"], user__is_active=1).first()
@@ -109,3 +110,12 @@ class AlumnoView(generics.CreateAPIView):
         alumno.save()
 
         return Response({"message": "Alumno  actualizado correctamente"}, status=status.HTTP_200_OK)
+    
+    #Función para eliminar un alumno específico por su ID
+    def delete(self, request, *args, **kwargs):
+        alumno = get_object_or_404(Alumnos, id=request.GET.get("id"))
+        try:
+            alumno.user.delete()
+            return Response({"details":"Alumno eliminado"},200)
+        except Exception as e:
+            return Response({"details":"Error al eliminar alumno"},400)
