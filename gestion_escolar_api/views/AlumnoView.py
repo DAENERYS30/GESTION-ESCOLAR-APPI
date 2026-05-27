@@ -80,7 +80,10 @@ class AlumnoView(generics.CreateAPIView):
                                             fecha_nacimiento= request.data["fecha_nacimiento"],
                                             edad= request.data["edad"],
                                             telefono= request.data["telefono"],
-                                            ocupacion= request.data["ocupacion"])
+                                            ocupacion= request.data["ocupacion"],
+                                            direccion= request.data["direccion"],
+                                            sexo= request.data["sexo"])
+                                            
             alumno.save()
 
             return Response({"Alumno creado ID": alumno.id }, 201)
@@ -105,8 +108,12 @@ class AlumnoView(generics.CreateAPIView):
         alumno.matricula = request.data["matricula"]
         alumno.curp = request.data["curp"].upper()
         alumno.rfc = request.data["rfc"].upper()
+        alumno.fecha_nacimiento = request.data["fecha_nacimiento"]
+        alumno.telefono = request.data["telefono"]
         alumno.edad = request.data["edad"]
         alumno.ocupacion = request.data["ocupacion"]
+        alumno.direccion = request.data["direccion"]
+        alumno.sexo = request.data["sexo"]  
         alumno.save()
 
         return Response({"message": "Alumno  actualizado correctamente"}, status=status.HTTP_200_OK)

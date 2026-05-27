@@ -12,9 +12,8 @@ from django.contrib.auth.models import Group
 import json
 from django.shortcuts import get_object_or_404
 
+""" para maestros, se pueden registrar, actualizar, eliminar y consultar maestros específicos o todos los maestros registrados """
 class MaestrosAll(generics.CreateAPIView):
-    #Obtener todos los maestros
-    # Necesita permisos de autenticación de usuario para poder acceder a la petición
     permission_classes = (permissions.IsAuthenticated,)
     def get(self, request, *args, **kwargs):
         maestros = Maestros.objects.filter(user__is_active=1).order_by("id")
@@ -22,7 +21,9 @@ class MaestrosAll(generics.CreateAPIView):
         for maestro in lista:
             if isinstance(maestro, dict) and "materias_json" in maestro:
                 try:
-                    maestro["materias_json"] = json.loads(maestro["materias_json"])
+                    #Cambiar comillas simples por dobles para que sea JSON válido
+                    materias_corregidas = maestro["materias_json"].replace("'", '"')
+                    maestro["materias_json"] = json.loads(materias_corregidas)
                 except Exception:
                     maestro["materias_json"] = []
         return Response(lista, 200)
@@ -88,7 +89,9 @@ class MaestroView(generics.CreateAPIView):
                                               rfc= request.data["rfc"].upper(),
                                               cubiculo= request.data["cubiculo"],
                                               area_investigacion= request.data["area_investigacion"],
-                                              materias_json= request.data["materias_json"])
+                                              materias_json= request.data["materias_json"],
+                                              campus= request.data["campus"],
+                                              sueldo= request.data["sueldo"])   
             maestro.save()
 
             return Response({"Maestro creado ID": maestro.id }, 201)
@@ -117,6 +120,8 @@ class MaestroView(generics.CreateAPIView):
         maestro.cubiculo = request.data["cubiculo"]
         maestro.area_investigacion = request.data["area_investigacion"]
         maestro.materias_json = request.data["materias_json"]
+        maestro.campus = request.data["campus"]
+        maestro.sueldo = request.data["sueldo"]
         maestro.save()
 
         return Response({"message": "Maestro actualizado correctamente"}, status=status.HTTP_200_OK)

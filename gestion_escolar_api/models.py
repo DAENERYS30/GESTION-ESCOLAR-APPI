@@ -21,6 +21,9 @@ class Administradores(models.Model):
     telefono = models.CharField(max_length=255, null=True, blank=True)
     rfc = models.CharField(max_length=255,null=True, blank=True)
     edad = models.IntegerField(null=True, blank=True)
+    """ nuevos campos para el administrador """
+    categoria = models.CharField(max_length=255, null=True, blank=True)
+    grado_academico = models.CharField(max_length=255, null=True, blank=True)
     ocupacion = models.CharField(max_length=255,null=True, blank=True)
     creation = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update = models.DateTimeField(null=True, blank=True)
@@ -39,6 +42,9 @@ class Maestros(models.Model):
     area_investigacion = models.CharField(max_length=255,null=True, blank=True)
     # CORRECCIÓN: Cambiado de materias_array a materias_json para que coincida con el frontend y vista
     materias_json = models.TextField(null=True, blank=True) 
+    """ nuevos campos para el maestro """
+    campus = models.CharField(max_length=255, null=True, blank=True)
+    sueldo = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     creation = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update = models.DateTimeField(null=True, blank=True)
 
@@ -56,8 +62,12 @@ class Alumnos(models.Model):
     edad = models.IntegerField(null=True, blank=True)
     telefono = models.CharField(max_length=255, null=True, blank=True)
     ocupacion = models.CharField(max_length=255, null=True, blank=True)
+    """ nuevos campos para el alumno """
+    direccion = models.CharField(max_length=255, null=True, blank=True)
+    sexo = models.CharField(max_length=255, null=True, blank=True)
     creation = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     update = models.DateTimeField(null=True, blank=True)
+    
 
     def __str__(self):
         return "Perfil del alumno "+self.user.first_name+" "+self.user.last_name
